@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+    <number_of_questions>2</number_of_questions>
+    <questions>
+        <question>
+            <type>BUTTON</type>
+            <number_of_strings>2</number_of_strings>
+            <strings>
+                <string>Choice 1</string>
+                <string>Choice 2</string>
+            </strings>
+        </question>
+        <question>
+            <type>BUTTON</type>
+            <number_of_strings>2</number_of_strings>
+            <strings>
+                <string>Choice 1</string>
+                <string>Choice 2</string>
+            </strings>
+        </question>
+    </questions>
+</data>
