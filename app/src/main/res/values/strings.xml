@@ -2,4 +2,14 @@
     <string name="app_name">Tester</string>
     <string name="button_start_text">Start demo</string>
     <string name="button_run_text">Run test</string>
+    <string name="exit_button_text">Exit</string>
+    <string name="check_button_text">Check</string>
+    <string name="next_button_text">Next</string>
+    <string name="you_answered_correct">You answered correct</string>
+    <string name="you_answered_incorrect">You answered incorrect</string>
+    <string name="question_">Question\u0020</string>
+    <string name="_of_">\u0020of\u0020</string>
+    <string name="no_checked_items">Please choose an answer</string>
+    <string name="correct">Correct</string>
+    <string name="incorrect">Incorrect</string>
 </resources>

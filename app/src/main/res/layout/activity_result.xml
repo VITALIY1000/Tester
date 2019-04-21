@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_margin="@dimen/default_margin"
-    tools:context=".MainActivity">
+    tools:context=".ResultActivity">
 
-    <Button
-        android:id="@+id/button_run"
+    <TextView
+        android:id="@+id/result_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_run_text"/>
+        android:textSize="@dimen/default_caption_text_view"
+        android:textColor="@android:color/black"/>
 
 </LinearLayout>
