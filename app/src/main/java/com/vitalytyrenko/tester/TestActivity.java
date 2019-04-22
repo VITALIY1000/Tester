@@ -1,14 +1,19 @@
 package com.vitalytyrenko.tester;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -23,11 +28,15 @@ import java.util.ArrayList;
 
 public class TestActivity extends AppCompatActivity {
 
+    public static final String RESULT_OBJECT = "RESULT_OBJECT";
+
     private Context context = this;
     private Button checkButton;
     private Button nextButton;
+    private Button finishButton;
     private LinearLayout container;    //consist elements (buttons, checkboxes, etc)
     private TextView caption;
+    private Toolbar toolbar;
 
     private View.OnClickListener tmpElementsClickListener = new View.OnClickListener() {
         @Override
@@ -40,7 +49,7 @@ public class TestActivity extends AppCompatActivity {
     private int questionNumber = 0;
     private Test sharedTest;                         //consist data of any questions
     private int mode;                                //mode of current question
-    private Result result = new Result();           //saving score and question number
+    private Result result = new Result();            //saving score and question number
     private ArrayList<Integer> checkedItems;         //saving ids of checked
     //          elements (buttons, checkboxes, etc)
 
@@ -51,11 +60,15 @@ public class TestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test);
 
         //initialization objects:
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         container = findViewById(R.id.container);
         caption = findViewById(R.id.caption);
         checkButton = findViewById(R.id.check_button);
         nextButton = findViewById(R.id.next_button);
         nextButton.setVisibility(View.GONE);
+        finishButton = findViewById(R.id.finish_button);
+        finishButton.setVisibility(View.GONE);
 
         //Get test object:
         Gson gson = new Gson();
@@ -85,11 +98,12 @@ public class TestActivity extends AppCompatActivity {
     }
 
 
+    //Expandable
     private void updateUI() {
-        /*txt.setTitle(getResources().getString(R.string.question_)
+        getSupportActionBar().setTitle(getResources().getString(R.string.question_)
                 .concat(Integer.toString(questionNumber + 1))
-                .concat(getResources().getString(R.string._of_)
-                        .concat(Integer.toString(sharedTest.getNumberOfQuestions()))));*/
+                .concat(getResources().getString(R.string._of_))
+                .concat(Integer.toString(sharedTest.getNumberOfQuestions())));
         //добавляем текст на toolbar
 
         caption.setText(sharedTest.getQuestion(questionNumber).getQuestionText());
@@ -118,6 +132,7 @@ public class TestActivity extends AppCompatActivity {
                 break;
             }
             case Question.TYPE_INPUT: {
+                container.addView(createView(0));
                 break;
             }
             default: {
@@ -127,6 +142,7 @@ public class TestActivity extends AppCompatActivity {
     }
 
 
+    //Expandable
     private View createView(int i) {
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT);
@@ -140,12 +156,6 @@ public class TestActivity extends AppCompatActivity {
                 button.setOnClickListener(tmpElementsClickListener);
                 //добавляем обработчик событий
 
-                //добавляем пометку правильно/неправильно
-                if (sharedTest.getQuestion(questionNumber).getCorrectAnswer().contains(i)) {
-                    button.setTag("correct");
-                } else {
-                    button.setTag("incorrect");
-                }
 
                 return button;
             }
@@ -157,17 +167,15 @@ public class TestActivity extends AppCompatActivity {
                 checkBox.setOnClickListener(tmpElementsClickListener);
                 //добавляем обработчик событий
 
-                //добавляем пометку правильно/неправильно
-                if (sharedTest.getQuestion(questionNumber).getCorrectAnswer().contains(i)) {
-                    checkBox.setTag("correct");
-                } else {
-                    checkBox.setTag("incorrect");
-                }
 
                 return checkBox;
             }
             case Question.TYPE_INPUT: {
-                break;
+                EditText editText = new EditText(context);
+                editText.setLayoutParams(layoutParams);
+                editText.setOnClickListener(tmpElementsClickListener);
+
+                return editText;
             }
         }
         return null;
@@ -182,6 +190,7 @@ public class TestActivity extends AppCompatActivity {
     }
 
 
+    //Expandable
     public void tmpViewClicked(View v) {
         switch (mode) {
             case Question.TYPE_BUTTON: {
@@ -219,6 +228,7 @@ public class TestActivity extends AppCompatActivity {
                 break;
             }
             case Question.TYPE_INPUT: {
+                //ничего не надо делать
                 break;
             }
             default: {
@@ -229,76 +239,112 @@ public class TestActivity extends AppCompatActivity {
     }
 
 
+    //Expandable
     public void onCheckButtonClicked(View v) {
         //проверки, проверки, проверки...
-        if (checkedItems != null && container.getChildCount() != 0) {
-            if (!checkedItems.isEmpty()) {
-                checkButton.setVisibility(View.GONE);
+        if ((checkedItems != null && container.getChildCount() != 0 && !checkedItems.isEmpty())
+                || mode == Question.TYPE_INPUT) {
+
+            checkButton.setVisibility(View.GONE);
+
+            if (questionNumber + 1 < sharedTest.getNumberOfQuestions()) {
                 nextButton.setVisibility(View.VISIBLE);
+            } else {
+                finishButton.setVisibility(View.VISIBLE);
+            }
 
-                switch (mode) {
-                    case Question.TYPE_BUTTON: {
-                        //если нажатая кнопка является правильным ответом
-                        if (sharedTest.getQuestion(questionNumber).getCorrectAnswer()
-                                .contains(checkedItems.get(0))) {
+            switch (mode) {
+                case Question.TYPE_BUTTON: {
+                    //если нажатая кнопка является правильным ответом
+                    if (sharedTest.getQuestion(questionNumber).getCorrectAnswer()
+                            .contains(checkedItems.get(0))) {
 
-                            setColorFilter(container.getChildAt(checkedItems.get(0)),
-                                    getResources().getColor(R.color.green));
-                            result.addScore();
-                            toast(getResources().getString(R.string.correct));
-                        } else {
-                            setColorFilter(container.getChildAt(checkedItems.get(0)),
-                                    getResources().getColor(R.color.red));
-                            toast(getResources().getString(R.string.incorrect));
-                        }
-                        break;
+                        setColorFilter(container.getChildAt(checkedItems.get(0)),
+                                getResources().getColor(R.color.green));
+                        result.addScore();
+                        toast(getResources().getString(R.string.correct));
+                    } else {
+                        setColorFilter(container.getChildAt(checkedItems.get(0)),
+                                getResources().getColor(R.color.red));
+                        toast(getResources().getString(R.string.incorrect));
                     }
-                    case Question.TYPE_CHECKBOX: {
-                        int i = 0;
-                        boolean isCorrect = true;
+                    break;
+                }
+                case Question.TYPE_CHECKBOX: {
+                    int i = 0;
+                    boolean isCorrect = true;
 
-                        //проходим по каждому отмеченному чекбоксу
-                        while (i < checkedItems.size()) {
-                            if (sharedTest.getQuestion(questionNumber).getCorrectAnswer()
-                                    .contains(checkedItems.get(i))) {
+                    //проходим по каждому отмеченному чекбоксу
+                    while (i < checkedItems.size()) {
+                        if (sharedTest.getQuestion(questionNumber).getCorrectAnswer()
+                                .contains(checkedItems.get(i))) {
+
+                            //если правильный чекбокс отмечен
+                            if (((CheckBox) container.getChildAt(checkedItems.get(i)))
+                                    .isChecked()) {
 
                                 container.getChildAt(checkedItems.get(i)).setBackgroundColor(
                                         getResources().getColor(R.color.green_100));
-
-                                //если правильный чекбокс неотмечен
-                                if (!((CheckBox) container.getChildAt(checkedItems.get(i)))
-                                        .isChecked())
-                                    //то вопрос не засчитывается
-                                    isCorrect = false;
-
                             } else {
                                 container.getChildAt(checkedItems.get(i)).setBackgroundColor(
                                         getResources().getColor(R.color.red_100));
 
-                                //если неправильный чекбокс отмечен
-                                if (((CheckBox) container.getChildAt(checkedItems.get(i)))
-                                        .isChecked())
-                                    //то вопрос не засчитывается
-                                    isCorrect = false;
+                                isCorrect = false;
                             }
 
-                            i++;
+                        } else {
+
+
+                            //если неправильный чекбокс неотмечен
+                            if (!((CheckBox) container.getChildAt(checkedItems.get(i)))
+                                    .isChecked()) {
+
+                                container.getChildAt(checkedItems.get(i)).setBackgroundColor(
+                                        getResources().getColor(R.color.green_100));
+                            } else {
+                                container.getChildAt(checkedItems.get(i)).setBackgroundColor(
+                                        getResources().getColor(R.color.red_100));
+
+                                isCorrect = false;
+                            }
+
                         }
 
-                        if (isCorrect)
-                            result.addScore();
+                        i++;
+                    }
 
-                        break;
-                    }
-                    case Question.TYPE_INPUT: {
-                        break;
-                    }
-                    default: {
+                    if (isCorrect)
+                        result.addScore();
 
-                    }
+                    break;
                 }
-            } else {
-                toast(getResources().getString(R.string.no_checked_items));
+                case Question.TYPE_INPUT: {
+                    String text = ((EditText) container.getChildAt(0))
+                            .getText().toString();
+                    int i = 0;
+                    boolean correct = false;
+
+                    while (i < sharedTest.getQuestion(questionNumber).getNumberOfAnswers()) {
+                        if (text.equals(sharedTest.getQuestion(questionNumber)
+                                .getAnswerText(i))) {
+                            correct = true;
+                            break;
+                        }
+                        i++;
+                    }
+
+                    if (correct) {
+                        toast(getResources().getString(R.string.correct));
+                        result.addScore();
+                    } else {
+                        toast(getResources().getString(R.string.incorrect));
+                    }
+
+                    break;
+                }
+                default: {
+
+                }
             }
             checkedItems = null;
         } else {
@@ -315,7 +361,9 @@ public class TestActivity extends AppCompatActivity {
             nextQuestion();
         } else {
             //переходим на экран результатов
+            Gson gson = new Gson();
             Intent intent = new Intent(context, ResultActivity.class);
+            intent.putExtra(RESULT_OBJECT, gson.toJson(result));
             startActivity(intent);
             finish();
         }
@@ -324,6 +372,35 @@ public class TestActivity extends AppCompatActivity {
 
     //exit from application
     public void onExitButtonClicked(View v) {
+        //то вызываем AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(R.string.you_sure)
+                .setCancelable(true)
+                .setNegativeButton(getResources().getString(android.R.string.cancel),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }
+                        })
+                .setPositiveButton(getResources().getString(android.R.string.ok),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(context, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+
+    public void onFinishButtonClicked(View v) {
+        //переходим на экран результатов
+        Gson gson = new Gson();
+        Intent intent = new Intent(context, ResultActivity.class);
+        intent.putExtra(RESULT_OBJECT, gson.toJson(result));
+        startActivity(intent);
         finish();
     }
 

@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Тестер</string>
+    <string name="button_run_text">Запустить демо-тест</string>
+
+    <string name="exit_button_text">Выйти</string>
+    <string name="check_button_text">Проверка</string>
+    <string name="next_button_text">Дальше</string>
+    <string name="finish_button_text">Завершить</string>
+
+    <string name="you_answered_correct">Ви ответили правильно</string>
+    <string name="you_answered_incorrect">Ви ответили неправильно</string>
+
+    <string name="question_">Вопрос\u0020</string>
+    <string name="_of_">\u0020из\u0020</string>
+
+    <string name="no_checked_items">Пожалуйста, дайте ответ</string>
+    <string name="correct">Правильно</string>
+    <string name="incorrect">Неправильно</string>
+    <string name="you_sure">Вв уверены?</string>
+</resources>
