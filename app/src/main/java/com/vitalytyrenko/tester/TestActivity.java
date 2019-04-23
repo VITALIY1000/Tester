@@ -81,6 +81,30 @@ public class TestActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        //вызываем AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(R.string.you_sure)
+                .setCancelable(true)
+                .setNegativeButton(getResources().getString(android.R.string.cancel),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }
+                        })
+                .setPositiveButton(getResources().getString(android.R.string.ok),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(context, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     private void startTest() {
         Question question = sharedTest.getQuestion(questionNumber);    //достаем 1 вопрос
         mode = question.getQuestionMode();                             //получаем тип вопроса
@@ -407,7 +431,7 @@ public class TestActivity extends AppCompatActivity {
 
     //exit from application
     public void onExitButtonClicked(View v) {
-        //то вызываем AlertDialog
+        //вызываем AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(R.string.you_sure)
                 .setCancelable(true)
