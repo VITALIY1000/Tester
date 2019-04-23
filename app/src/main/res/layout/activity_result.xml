@@ -4,13 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="@dimen/default_margin"
     tools:context=".ResultActivity">
 
     <TextView
         android:id="@+id/result_text_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
         android:textSize="@dimen/default_caption_text_view"
         android:textColor="@android:color/black"/>
+
+    <Button
+        android:onClick="buttonToMainMenuClicked"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/to_main_menu"
+        android:textSize="@dimen/default_button_text_size"/>
 
 </LinearLayout>

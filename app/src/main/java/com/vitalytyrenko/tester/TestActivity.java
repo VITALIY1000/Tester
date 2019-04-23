@@ -37,6 +37,7 @@ public class TestActivity extends AppCompatActivity {
     private LinearLayout container;    //consist elements (buttons, checkboxes, etc)
     private TextView caption;
     private Toolbar toolbar;
+    private LinearLayout output;
 
     private View.OnClickListener tmpElementsClickListener = new View.OnClickListener() {
         @Override
@@ -49,7 +50,7 @@ public class TestActivity extends AppCompatActivity {
     private int questionNumber = 0;
     private Test sharedTest;                         //consist data of any questions
     private int mode;                                //mode of current question
-    private Result result = new Result();            //saving score and question number
+    private Result result;            //saving score and question number
     private ArrayList<Integer> checkedItems;         //saving ids of checked
     //          elements (buttons, checkboxes, etc)
 
@@ -66,14 +67,14 @@ public class TestActivity extends AppCompatActivity {
         caption = findViewById(R.id.caption);
         checkButton = findViewById(R.id.check_button);
         nextButton = findViewById(R.id.next_button);
-        nextButton.setVisibility(View.GONE);
         finishButton = findViewById(R.id.finish_button);
-        finishButton.setVisibility(View.GONE);
+        output = findViewById(R.id.output);
 
         //Get test object:
         Gson gson = new Gson();
         sharedTest = gson.fromJson(getIntent().getStringExtra(ChoiceActivity.JSON_OBJECT),
                 Test.class);
+        result = new Result(sharedTest.getNumberOfQuestions());
 
         //start test at first question
         startTest();
@@ -91,6 +92,7 @@ public class TestActivity extends AppCompatActivity {
     private void nextQuestion() {
         updateData();
 
+        hideOutput();
         Question question = sharedTest.getQuestion(questionNumber);    //достаем 1 вопрос
         mode = question.getQuestionMode();                             //получаем тип вопроса
         updateUI();                           //обновляем пользовательский интерфейс
@@ -161,8 +163,12 @@ public class TestActivity extends AppCompatActivity {
             }
             case Question.TYPE_CHECKBOX: {
                 CheckBox checkBox = new CheckBox(context);
+                int margin = Math.round(getResources().getDimension(R.dimen.default_margin));
+                layoutParams.setMargins(0, margin, 0, 0);
                 checkBox.setLayoutParams(layoutParams);
                 checkBox.setText(sharedTest.getQuestion(questionNumber).getAnswerText(i));
+                checkBox.setTextSize(getResources()
+                        .getDimensionPixelSize(R.dimen.default_checkbox_text_size));
                 //берем текст елемента по индексу
                 checkBox.setOnClickListener(tmpElementsClickListener);
                 //добавляем обработчик событий
@@ -243,7 +249,8 @@ public class TestActivity extends AppCompatActivity {
     public void onCheckButtonClicked(View v) {
         //проверки, проверки, проверки...
         if ((checkedItems != null && container.getChildCount() != 0 && !checkedItems.isEmpty())
-                || mode == Question.TYPE_INPUT) {
+                || (mode == Question.TYPE_INPUT && !((EditText) container.getChildAt(0))
+                .getText().toString().isEmpty())) {
 
             checkButton.setVisibility(View.GONE);
 
@@ -262,11 +269,11 @@ public class TestActivity extends AppCompatActivity {
                         setColorFilter(container.getChildAt(checkedItems.get(0)),
                                 getResources().getColor(R.color.green));
                         result.addScore();
-                        toast(getResources().getString(R.string.correct));
+                        showOutput(true);
                     } else {
                         setColorFilter(container.getChildAt(checkedItems.get(0)),
                                 getResources().getColor(R.color.red));
-                        toast(getResources().getString(R.string.incorrect));
+                        showOutput(false);
                     }
                     break;
                 }
@@ -313,14 +320,18 @@ public class TestActivity extends AppCompatActivity {
                         i++;
                     }
 
-                    if (isCorrect)
+                    if (isCorrect) {
                         result.addScore();
+                        showOutput(true);
+                    } else {
+                        showOutput(false);
+                    }
 
                     break;
                 }
                 case Question.TYPE_INPUT: {
-                    String text = ((EditText) container.getChildAt(0))
-                            .getText().toString();
+                    EditText editText = ((EditText) container.getChildAt(0));
+                    String text = editText.getText().toString();
                     int i = 0;
                     boolean correct = false;
 
@@ -334,10 +345,14 @@ public class TestActivity extends AppCompatActivity {
                     }
 
                     if (correct) {
-                        toast(getResources().getString(R.string.correct));
+                        editText.setBackgroundColor(
+                                getResources().getColor(R.color.green_100));
+                        showOutput(true);
                         result.addScore();
                     } else {
-                        toast(getResources().getString(R.string.incorrect));
+                        editText.setBackgroundColor(
+                                getResources().getColor(R.color.red_100));
+                        showOutput(false);
                     }
 
                     break;
@@ -350,6 +365,26 @@ public class TestActivity extends AppCompatActivity {
         } else {
             toast(getResources().getString(R.string.no_checked_items));
         }
+    }
+
+
+    private void showOutput(boolean isCorrect) {
+        if (isCorrect) {
+            TextView outputTV = (TextView) output.getChildAt(0);
+            outputTV.setTextColor(getResources().getColor(R.color.green));
+            outputTV.setText(getResources().getString(R.string.correct));
+            output.setVisibility(View.VISIBLE);
+        } else {
+            TextView outputTV = (TextView) output.getChildAt(0);
+            outputTV.setTextColor(getResources().getColor(R.color.red));
+            outputTV.setText(getResources().getString(R.string.incorrect));
+            output.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    private void hideOutput() {
+        output.setVisibility(View.GONE);
     }
 
 

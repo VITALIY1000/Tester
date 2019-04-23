@@ -17,4 +17,10 @@
     <string name="correct">Correct</string>
     <string name="incorrect">Incorrect</string>
     <string name="you_sure">You sure?</string>
+    
+    <string name="you_scored_">You answered\u0020</string>
+    <string name="_out_of_">\u0020of\u0020</string>
+    <string name="_points">\u0020questions correctly</string>
+
+    <string name="to_main_menu">To the main menu</string>
 </resources>

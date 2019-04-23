@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Тестер</string>
+    <string name="button_run_text">Запустити демо-тест</string>
+
+    <string name="exit_button_text">Вийти</string>
+    <string name="check_button_text">Перевірка</string>
+    <string name="next_button_text">Далі</string>
+    <string name="finish_button_text">Завершити</string>
+
+    <string name="you_answered_correct">Ви відповіли правильно</string>
+    <string name="you_answered_incorrect">Ви відповіли неправильно</string>
+
+    <string name="question_">Питання\u0020</string>
+    <string name="_of_">\u0020з\u0020</string>
+
+    <string name="no_checked_items">Будь-ласка, дайте відповідь</string>
+    <string name="correct">Правильно</string>
+    <string name="incorrect">Неправильно</string>
+    <string name="you_sure">Ви впевнені?</string>
+
+    <string name="you_scored_">Ви відповіли правильно на\u0020</string>
+    <string name="_out_of_">\u0020з\u0020</string>
+    <string name="_points">\u0020запитань</string>
+
+    <string name="to_main_menu">До головного меню</string>
+</resources>
